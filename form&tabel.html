@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrasi dan list Pendaftaran</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4c1c1;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #f72b2b;
+        }
+
+        li {
+            float: left;
+            background: #fc1818;
+        }
+
+        li a {
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+        }
+
+        li a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .tab {
+            display: none;
+            padding: 20px;
+            background-color: #fff;
+            margin: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .active-tab {
+            display: block;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        input[type="submit"] {
+            background-color: #fe1d1d;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        #resume {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 12px;
+            margin-top: -10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li><a href="#" onclick="openTab('registrasi')">Registrasi</a></li>
+        <li><a href="#" onclick="openTab('list-pendaftar')">List Pendaftar</a></li>
+    </ul>
+
+    <div id="registrasi" class="tab active-tab">
+        <h2>Form Registrasi</h2>
+        <form id="registration-form" onsubmit="return validateForm()">
+            <label for="nama">Nama:</label>
+            <input type="text" id="nama" name="nama" required minlength="10"><br><br>
+
+            <label for="umur">Umur:</label>
+            <input type="number" id="umur" name="umur" required min="25"><br><br>
+
+            <label for="uang-sangu">Uang Sangu (Rp.):</label>
+            <input type="number" id="uang-sangu" name="uang-sangu" required min="100000" max="1000000"><br><br>
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <div id="list-pendaftar" class="tab">
+        <h2>List Pendaftar</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama</th>
+                    <th>Umur</th>
+                    <th>Uang Sangu (Rp.)</th>
+                </tr>
+            </thead>
+            <tbody id="pendaftar-list"></tbody>
+        </table>
+        <p id="resume"></p>
+    </div>
+
+    <script>
+        let pendaftar = [];
+
+        function openTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.style.display = 'none';
+            });
+            document.getElementById(tabName).style.display = 'block';
+        }
+
+        function validateForm() {
+            const nama = document.getElementById('nama').value;
+            const umur = parseInt(document.getElementById('umur').value);
+            const uangSangu = parseInt(document.getElementById('uang-sangu').value);
+
+            if (nama.length < 10 || umur < 25 || uangSangu < 100000 || uangSangu > 1000000) {
+                alert('Mohon periksa kembali data yang Anda masukkan.');
+                return false;
+            }
+
+            pendaftar.push({ nama, umur, uangSangu });
+
+            displayPendaftar();
+
+            document.getElementById('registration-form').reset();
+
+            return false;
+        }
+
+        function displayPendaftar() {
+            const tableBody = document.getElementById('pendaftar-list');
+            const resume = document.getElementById('resume');
+            tableBody.innerHTML = '';
+
+            pendaftar.forEach(data => {
+                const row = tableBody.insertRow();
+                const cellNama = row.insertCell(0);
+                const cellUmur = row.insertCell(1);
+                const cellUangSangu = row.insertCell(2);
+
+                cellNama.innerHTML = data.nama;
+                cellUmur.innerHTML = data.umur;
+                cellUangSangu.innerHTML = data.uangSangu;
+            });
+            const totalUmur = pendaftar.reduce((acc, data) => acc + data.umur, 0);
+            const totalUangSangu = pendaftar.reduce((acc, data) => acc + data.uangSangu, 0);
+            const rataRataUmur = totalUmur / pendaftar.length;
+            const rataRataUangSangu = totalUangSangu / pendaftar.length;
+
+            resume.innerHTML = `Rata-rata pendaftar memiliki uang sangu sebesar Rp.${rataRataUangSangu.toFixed(2)} dengan rata-rata umur ${rataRataUmur.toFixed(2)} tahun.`;
+        }
+        openTab('registrasi');
+    </script>
+</body>
+</html>
